@@ -23,7 +23,6 @@ export function createQuery<TParams, TData>(
     queryKey: keyFn,
     queryFn: fetcher,
     useQuery(params, options) {
-       
       return useTanstackQuery<TData, Error>({
         queryKey: keyFn(params),
         queryFn: () => fetcher(params),
