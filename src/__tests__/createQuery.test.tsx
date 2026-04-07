@@ -130,3 +130,48 @@ describe('createQuery — useQuery shorthand', () => {
     await waitFor(() => expect(result.current.data?.id).toBe(2));
   });
 });
+
+// ---------------------------------------------------------------------------
+// Definition shape (unit-level)
+// ---------------------------------------------------------------------------
+
+describe('createQuery — definition shape', () => {
+  it('returns a QueryDefinition with queryKey, queryFn, and useQuery properties', () => {
+    const def = createQuery(
+      (id: string) => ['user', id] as const,
+      async (id: string) => ({ id, name: 'Alice' }),
+    );
+    expect(typeof def.queryKey).toBe('function');
+    expect(typeof def.queryFn).toBe('function');
+    expect(typeof def.useQuery).toBe('function');
+  });
+
+  it('queryKey produces a stable value for the same params', () => {
+    const def = createQuery(
+      (id: number) => ['item', id] as const,
+      async (id: number) => id,
+    );
+    expect(def.queryKey(1)).toEqual(def.queryKey(1));
+  });
+
+  it('queryFn return type is inferred from the fetcher (TData inference)', async () => {
+    const def = createQuery(
+      (n: number) => ['count', n] as const,
+      async (n: number) => ({ value: n * 2 }),
+    );
+    const result = await def.queryFn(5);
+    expect(result.value).toBe(10);
+  });
+
+  it('useQuery keys isolate data per param (different string params)', async () => {
+    const fetcher = vi.fn(async (id: string) => ({ id }));
+    const def = createQuery((id: string) => ['entity', id] as const, fetcher);
+    const wrapper = makeWrapper();
+    const { result: r1 } = renderHook(() => def.useQuery('a'), { wrapper });
+    const { result: r2 } = renderHook(() => def.useQuery('b'), { wrapper });
+    await waitFor(() => expect(r1.current.isSuccess).toBe(true));
+    await waitFor(() => expect(r2.current.isSuccess).toBe(true));
+    expect(r1.current.data).toEqual({ id: 'a' });
+    expect(r2.current.data).toEqual({ id: 'b' });
+  });
+});
