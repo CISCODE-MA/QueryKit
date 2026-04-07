@@ -165,6 +165,34 @@ describe('usePaginatedQuery — offset mode', () => {
     );
     expect(result.current.pageSize).toBe(20);
   });
+
+  it('returns mode: offset', async () => {
+    const { result } = renderHook(
+      () =>
+        usePaginatedQuery(
+          offsetQueryDef,
+          { page: 1, pageSize: 3 },
+          { mode: 'offset', pageSize: 3 },
+        ),
+      { wrapper: makeWrapper() },
+    );
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.mode).toBe('offset');
+  });
+
+  it('respects initialPage option', async () => {
+    const { result } = renderHook(
+      () =>
+        usePaginatedQuery(
+          offsetQueryDef,
+          { page: 2, pageSize: 3 },
+          { mode: 'offset', pageSize: 3, initialPage: 2 },
+        ),
+      { wrapper: makeWrapper() },
+    );
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.page).toBe(2);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -264,5 +292,22 @@ describe('usePaginatedQuery — cursor mode', () => {
     );
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.nextCursor).toBe(3);
+  });
+
+  it('returns mode: cursor', async () => {
+    const { result } = renderHook(
+      () =>
+        usePaginatedQuery(
+          cursorQueryDef,
+          { cursor: undefined },
+          {
+            mode: 'cursor',
+            getCursor: (page) => (page.length > 0 ? page[page.length - 1].id : undefined),
+          },
+        ),
+      { wrapper: makeWrapper() },
+    );
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.mode).toBe('cursor');
   });
 });

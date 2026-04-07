@@ -181,3 +181,23 @@ describe('createMutation — useMutation shorthand', () => {
     ).rejects.toThrow('mutation failed');
   });
 });
+
+// ---------------------------------------------------------------------------
+// Definition shape (unit-level)
+// ---------------------------------------------------------------------------
+
+describe('createMutation — definition shape', () => {
+  it('returns a MutationDefinition with mutationFn and useMutation properties', () => {
+    const def = createMutation(async (input: { name: string }) => ({ id: 1, name: input.name }));
+    expect(typeof def.mutationFn).toBe('function');
+    expect(typeof def.useMutation).toBe('function');
+  });
+
+  it('mutationFn calls the underlying fn directly (without hook)', async () => {
+    const fn = vi.fn(async (input: { name: string }) => ({ id: 1, name: input.name }));
+    const def = createMutation(fn);
+    const result = await def.mutationFn({ name: 'Alice' });
+    expect(fn).toHaveBeenCalledWith({ name: 'Alice' });
+    expect(result).toEqual({ id: 1, name: 'Alice' });
+  });
+});
