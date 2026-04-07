@@ -131,7 +131,8 @@ describe('createMutation', () => {
   });
 
   it('isError and error are set on failure', async () => {
-    const def = createMutation(async (_input: CreateUserInput): Promise<User> => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const def = createMutation(async (_: CreateUserInput): Promise<User> => {
       throw new Error('server error');
     });
 
