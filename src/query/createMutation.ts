@@ -14,7 +14,6 @@ export function createMutation<TVariables, TData>(
   return {
     mutationFn: fn,
     useMutation() {
-       
       return useTanstackMutation<TData, Error, TVariables>({
         mutationFn: fn,
       });
