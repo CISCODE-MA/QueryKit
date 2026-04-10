@@ -1,6 +1,6 @@
 {
   "name": "@ciscode/query-kit",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Typed abstraction over TanStack Query v5.",
   "license": "MIT",
   "private": false,
